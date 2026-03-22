@@ -1,0 +1,350 @@
+--------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Abdul\Desktop\BUI\Financial Modelling\Revision\Untitled.lo
+> g
+  log type:  text
+ opened on:  28 Dec 2025, 12:22:34
+
+. log using "C:\Users\Abdul\Desktop\BUI\Financial Modelling\Revision\panal data 
+> practice log.smcl"
+log file already open
+r(604);
+
+. 
+. encode company, gen(comp)
+comp already defined
+r(110);
+
+. 
+. tstest comp year
+unrecognized command:  tstest
+r(199);
+
+. 
+. tsset comp year
+       panel variable:  comp (unbalanced)
+        time variable:  year, 2007 to 2010, but with gaps
+                delta:  1 unit
+
+. 
+. reg cash cft liq lev mbr size
+
+      Source |       SS       df       MS              Number of obs =    1005
+-------------+------------------------------           F(  5,   999) =  128.88
+       Model |  3.89217968     5  .778435935           Prob > F      =  0.0000
+    Residual |  6.03400811   999  .006040048           R-squared     =  0.3921
+-------------+------------------------------           Adj R-squared =  0.3891
+       Total |  9.92618778  1004  .009886641           Root MSE      =  .07772
+
+------------------------------------------------------------------------------
+        cash |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         cft |   .0498717   .0128417     3.88   0.000     .0246718    .0750715
+         liq |   .0045446    .001186     3.83   0.000     .0022174    .0068719
+         lev |   .0045336   .0011858     3.82   0.000     .0022066    .0068606
+         mbr |   .0018393   .0004299     4.28   0.000     .0009956    .0026829
+        size |   .0069457   .0014679     4.73   0.000     .0040652    .0098263
+       _cons |   -.071728   .0218903    -3.28   0.001    -.1146843   -.0287716
+------------------------------------------------------------------------------
+
+. 
+. hettest
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of cash
+
+         chi2(1)      =     3.41
+         Prob > chi2  =   0.0648
+
+. 
+. winsor cash, gen(wcash) p(0.1)
+generate() should give new variable name
+r(110);
+
+. 
+. winsor cft, gen(wcft) p(0.1)
+generate() should give new variable name
+r(110);
+
+. 
+. winsor liq, gen(wliq) p(0.1)
+generate() should give new variable name
+r(110);
+
+. 
+. winsor lev, gen(wlev)
+generate() should give new variable name
+r(110);
+
+. 
+. winsor lev, gen(wlev) p(0.1)
+generate() should give new variable name
+r(110);
+
+. 
+. winsir mbr, gen(wmbr) p(0.1)
+unrecognized command:  winsir
+r(199);
+
+. 
+. winsor mbr, gen(wmbr) p(0.1)
+generate() should give new variable name
+r(110);
+
+. 
+. winsor size, gen(wsize) p(0.1)
+generate() should give new variable name
+r(110);
+
+. 
+. reg wcash wcft wliq wlev wmbr wsize
+
+      Source |       SS       df       MS              Number of obs =    1005
+-------------+------------------------------           F(  5,   999) =   99.52
+       Model |  .434752079     5  .086950416           Prob > F      =  0.0000
+    Residual |  .872783669   999  .000873657           R-squared     =  0.3325
+-------------+------------------------------           Adj R-squared =  0.3292
+       Total |  1.30753575  1004  .001302326           Root MSE      =  .02956
+
+------------------------------------------------------------------------------
+       wcash |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        wcft |   .0584347   .0131636     4.44   0.000     .0326032    .0842662
+        wliq |   .0413024   .0048434     8.53   0.000     .0317979    .0508069
+        wlev |  -.0435425   .0050055    -8.70   0.000    -.0533651     -.03372
+        wmbr |    .024437   .0031652     7.72   0.000     .0182259    .0306482
+       wsize |   .0025941   .0006801     3.81   0.000     .0012595    .0039287
+       _cons |  -.0290959   .0104139    -2.79   0.005    -.0495314   -.0086603
+------------------------------------------------------------------------------
+
+. 
+. xtreg wcash wcft wliq wlev wmbr wsize, fe
+
+Fixed-effects (within) regression               Number of obs      =      1005
+Group variable: comp                            Number of groups   =       313
+
+R-sq:  within  = 0.0515                         Obs per group: min =         1
+       between = 0.2769                                        avg =       3.2
+       overall = 0.2296                                        max =         4
+
+                                                F(5,687)           =      7.47
+corr(u_i, Xb)  = 0.3268                         Prob > F           =    0.0000
+
+------------------------------------------------------------------------------
+       wcash |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        wcft |   .0166351   .0136069     1.22   0.222     -.010081    .0433512
+        wliq |   .0050993   .0066619     0.77   0.444    -.0079808    .0181794
+        wlev |  -.0242278   .0054481    -4.45   0.000    -.0349248   -.0135308
+        wmbr |   .0108332   .0038144     2.84   0.005     .0033438    .0183225
+       wsize |  -.0017981   .0038221    -0.47   0.638    -.0093024    .0057062
+       _cons |   .0490643   .0573659     0.86   0.393    -.0635691    .1616977
+-------------+----------------------------------------------------------------
+     sigma_u |  .02866038
+     sigma_e |  .01969956
+         rho |  .67914358   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+F test that all u_i=0:     F(312, 687) =     5.01            Prob > F = 0.0000
+
+. 
+. estimate store fe
+
+. 
+. xtreg wcash wliq wlev wmbr wsize, re
+
+Random-effects GLS regression                   Number of obs      =      1005
+Group variable: comp                            Number of groups   =       313
+
+R-sq:  within  = 0.0434                         Obs per group: min =         1
+       between = 0.4103                                        avg =       3.2
+       overall = 0.3154                                        max =         4
+
+                                                Wald chi2(4)       =    200.71
+corr(u_i, X)   = 0 (assumed)                    Prob > chi2        =    0.0000
+
+------------------------------------------------------------------------------
+       wcash |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        wliq |   .0302223   .0050899     5.94   0.000     .0202463    .0401982
+        wlev |  -.0375564   .0046616    -8.06   0.000     -.046693   -.0284199
+        wmbr |    .020853   .0030078     6.93   0.000     .0149579    .0267481
+       wsize |   .0029374   .0009927     2.96   0.003     .0009917    .0048831
+       _cons |   -.025154   .0148919    -1.69   0.091    -.0543415    .0040335
+-------------+----------------------------------------------------------------
+     sigma_u |  .02132804
+     sigma_e |  .01970664
+         rho |  .53945134   (fraction of variance due to u_i)
+------------------------------------------------------------------------------
+
+. 
+. estimate store re
+
+. 
+. hausman fe re
+
+                 ---- Coefficients ----
+             |      (b)          (B)            (b-B)     sqrt(diag(V_b-V_B))
+             |       fe           re         Difference          S.E.
+-------------+----------------------------------------------------------------
+        wliq |    .0050993     .0302223        -.025123        .0042981
+        wlev |   -.0242278    -.0375564        .0133287        .0028199
+        wmbr |    .0108332      .020853       -.0100198        .0023459
+       wsize |   -.0017981     .0029374       -.0047355        .0036909
+------------------------------------------------------------------------------
+                           b = consistent under Ho and Ha; obtained from xtreg
+            B = inconsistent under Ha, efficient under Ho; obtained from xtreg
+
+    Test:  Ho:  difference in coefficients not systematic
+
+                  chi2(4) = (b-B)'[(V_b-V_B)^(-1)](b-B)
+                          =       55.52
+                Prob>chi2 =      0.0000
+
+. 
+. ##AS THE PROBABILITY IS LESS THE 0.5 SO WE WILL GO WITH FIXED EFFECT
+Unknown #command
+
+. 
+. xtabond wcash wcft wliq wlev wmbr wsize, lags(1) twostep artests(2)
+
+Arellano-Bond dynamic panel-data estimation  Number of obs         =       282
+Group variable: comp                         Number of groups      =       143
+Time variable: year
+                                             Obs per group:    min =         1
+                                                               avg =  1.972028
+                                                               max =         2
+
+Number of instruments =      9               Wald chi2(6)          =      8.56
+                                             Prob > chi2           =    0.2002
+Two-step results
+------------------------------------------------------------------------------
+       wcash |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       wcash |
+         L1. |    .310204   .2519381     1.23   0.218    -.1835855    .8039936
+             |
+        wcft |  -.0008969   .0234733    -0.04   0.970    -.0469036    .0451099
+        wliq |   .0031041   .0126718     0.24   0.806    -.0217322    .0279404
+        wlev |   .0034655   .0103782     0.33   0.738    -.0168754    .0238063
+        wmbr |   .0135379   .0085445     1.58   0.113    -.0032091    .0302848
+       wsize |  -.0181227   .0099059    -1.83   0.067     -.037538    .0012926
+       _cons |   .2752608   .1507462     1.83   0.068    -.0201964     .570718
+------------------------------------------------------------------------------
+Warning: gmm two-step standard errors are biased; robust standard 
+         errors are recommended.
+Instruments for differenced equation
+        GMM-type: L(2/.).wcash
+        Standard: D.wcft D.wliq D.wlev D.wmbr D.wsize
+Instruments for level equation
+        Standard: _cons
+
+. 
+. xtabond wcash wcft wliq wlev wmbr wsize, diffvars(l.wcft l.wlev) lags(1) twost
+> ep artests(2)
+diffvars() may not be specified when performing system estimation
+r(498);
+
+. 
+. xtabond wcash wcft wliq wlev wmbr wsize, inst(l.wcft l.wlev) lags(1) twostep a
+> rtests(2)
+
+Arellano-Bond dynamic panel-data estimation  Number of obs         =       282
+Group variable: comp                         Number of groups      =       143
+Time variable: year
+                                             Obs per group:    min =         1
+                                                               avg =  1.972028
+                                                               max =         2
+
+Number of instruments =     11               Wald chi2(6)          =     16.57
+                                             Prob > chi2           =    0.0110
+Two-step results
+------------------------------------------------------------------------------
+       wcash |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       wcash |
+         L1. |   .5307774    .145297     3.65   0.000     .2460006    .8155543
+             |
+        wcft |   .0082402    .024703     0.33   0.739    -.0401769    .0566573
+        wliq |  -.0036292   .0128651    -0.28   0.778    -.0288443    .0215859
+        wlev |   .0157472   .0073785     2.13   0.033     .0012856    .0302089
+        wmbr |    .014097   .0094298     1.49   0.135    -.0043851    .0325791
+       wsize |  -.0122145   .0107305    -1.14   0.255    -.0332459    .0088169
+       _cons |   .1760321   .1631485     1.08   0.281    -.1437331    .4957973
+------------------------------------------------------------------------------
+Warning: gmm two-step standard errors are biased; robust standard 
+         errors are recommended.
+Instruments for differenced equation
+        GMM-type: L(2/.).wcash
+        Standard: D.wcft D.wliq D.wlev D.wmbr D.wsize L.wcft L.wlev
+Instruments for level equation
+        Standard: _cons
+
+. 
+. xtabond wcash wcft wliq wlev wmbr wsize, inst(l.wcft l.wlev) lags(1) twostep a
+> rtests(2)
+
+Arellano-Bond dynamic panel-data estimation  Number of obs         =       282
+Group variable: comp                         Number of groups      =       143
+Time variable: year
+                                             Obs per group:    min =         1
+                                                               avg =  1.972028
+                                                               max =         2
+
+Number of instruments =     11               Wald chi2(6)          =     16.57
+                                             Prob > chi2           =    0.0110
+Two-step results
+------------------------------------------------------------------------------
+       wcash |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       wcash |
+         L1. |   .5307774    .145297     3.65   0.000     .2460006    .8155543
+             |
+        wcft |   .0082402    .024703     0.33   0.739    -.0401769    .0566573
+        wliq |  -.0036292   .0128651    -0.28   0.778    -.0288443    .0215859
+        wlev |   .0157472   .0073785     2.13   0.033     .0012856    .0302089
+        wmbr |    .014097   .0094298     1.49   0.135    -.0043851    .0325791
+       wsize |  -.0122145   .0107305    -1.14   0.255    -.0332459    .0088169
+       _cons |   .1760321   .1631485     1.08   0.281    -.1437331    .4957973
+------------------------------------------------------------------------------
+Warning: gmm two-step standard errors are biased; robust standard 
+         errors are recommended.
+Instruments for differenced equation
+        GMM-type: L(2/.).wcash
+        Standard: D.wcft D.wliq D.wlev D.wmbr D.wsize L.wcft L.wlev
+Instruments for level equation
+        Standard: _cons
+
+. 
+. estat sargon
+invalid subcommand sargon
+r(321);
+
+. 
+. estat sargan
+Sargan test of overidentifying restrictions
+        H0: overidentifying restrictions are valid
+
+        chi2(4)      =  4.265647
+        Prob > chi2  =    0.3712
+
+. 
+. estat abond
+
+Arellano-Bond test for zero autocorrelation in first-differenced errors
+  +-----------------------+
+  |Order |  z     Prob > z|
+  |------+----------------|
+  |   1  |-2.8113  0.0049 |
+  |   2  |      .       . |
+  +-----------------------+
+   H0: no autocorrelation 
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\Abdul\Desktop\BUI\Financial Modelling\Revision\Untitled.lo
+> g
+  log type:  text
+ closed on:  28 Dec 2025, 12:22:54
+--------------------------------------------------------------------------------
